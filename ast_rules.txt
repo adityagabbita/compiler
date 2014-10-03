@@ -1,0 +1,270 @@
+<program> ===> <otherFunctions> <mainFunction>	
+#no change; retain
+
+<mainFunction>===> TK_MAIN <stmts> TK_END	
+
+#pull up TK_MAIN; TK_MAIN---> <stmts>; remove TK_END
+
+<otherFunctions>===> <function><otherFunctions>	
+#no change; retain
+
+<otherFunctions>===> eps			
+#do nothing
+
+<function>===>TK_FUNID <input_par> <output_par> TK_SEM <stmts> TK_END		
+#pull up TK_FUNID; TK_FUNID ---> <input_par> <output_par> <stmts>
+
+<input_par>===>TK_INPUT TK_PARAMETER TK_LIST TK_SQL <parameter_list> TK_SQR	
+#pull up TK_INPUT; TK_INPUT ---> <parameter_list>; remove remaining
+
+<output_par>===>TK_OUTPUT TK_PARAMETER TK_LIST TK_SQL <parameter_list> TK_SQR	
+#pull up TK_OUTPUT; TK_OUTPUT ---> <parameter_list>; remove remaining
+
+<output_par>===> eps						
+#do nothing
+
+<parameter_list>===> <dataType> TK_ID <remaining_list>		
+#pull up TK_ID; TK_ID---> <datatype><remaining_list>
+
+<dataType>===> <primitiveDatatype>		
+#pull up <primitiveDatatype>
+
+<dataType>===> <constructedDatatype>		
+#pull up <constructedDatatype>
+
+<primitiveDatatype>===> TK_INT 	 		
+#pull up TK_INT			
+
+<primitiveDatatype>===> TK_REAL			
+#pull up TK_REAL
+
+<constructedDatatype>===>TK_RECORD TK_RECORDID	
+#pull up TK_RECORD; TK_RECORD---> TK_RECORDID
+
+<remaining_list>===>TK_COMMA <parameter_list>	
+#pull up <parameter list>; remove TK_COMMA
+
+<remaining_list>===> eps			
+#do nothing
+
+<stmts>===><typeDefinitions> <declarations> <otherStmts> <returnStmt>
+#no change; retain
+
+<typeDefinitions>===><typeDefinition><typeDefinitions>			
+#pull up <typeDefinition>; <typeDefinition>---><typeDefinitions>;(only right child mentioned here)
+
+<typeDefinitions>===> eps						
+#do nothing
+
+<typeDefinition>===>TK_RECORD TK_RECORDID <fieldDefinitions> TK_ENDRECORD TK_SEM	
+#pull up TK_RECORDID; TK_RECORDID---> <fieldDefinitions>; (only left child mentioned here)
+
+<fieldDefinitions>===> <fieldDefinition><fieldDefinition><moreFields>
+#pull up <fieldDefinition>; <fieldDefinition> ---> <fieldDefinition> ---> <moreFields>;(only right children mentioned here)
+
+<fieldDefinition>===> TK_TYPE <primitiveDatatype> TK_COLON TK_FIELDID TK_SEM 
+#pull up TK_FIELDID; TK_FIELDID ---> <primitiveDatatype>; (only left child mentioned here)
+
+<moreFields>===><fieldDefinition><moreFields> 		
+#pull up <fieldDefinition>; <fieldDefinition> ---> <moreFields> 
+
+<moreFields>===> eps 		
+#do nothing
+
+<declarations> ===> <declaration><declarations> 		
+#pull up <declaration>; <declaration> ---> <declarations>; (only rightost child mentioned here)
+
+<declarations> ===> eps 	
+#do nothing	
+
+<declaration>===> TK_TYPE <dataType> TK_COLON TK_ID <global_or_not> TK_SEM	
+#pull up TK_ID; TK_ID ---> <dataType><global_or_not>
+
+<global_or_not>===>TK_COLON TK_GLOBAL		
+#pull up TK_GLOBAL
+
+<global_or_not>===> eps		
+#do nothing
+
+<otherStmts>===> <stmt><otherStmts>		
+#no change; retain
+
+<otherStmts>===> eps		
+#do nothing
+
+<stmt>===> <assignmentStmt>	
+#pull up <assignmentStmt>
+
+<stmt>===> <iterativeStmt>	
+#pull up <iterativeStmt>
+
+<stmt>===> <conditionalStmt>	
+#pull up <conditionalStmt>
+
+<stmt>===> <ioStmt>		
+#pull up <ioStmt>	
+
+<stmt>===> <funCallStmt>	
+#pull up <funCallStmt>	
+
+<assignmentStmt>===><SingleOrRecId> TK_ASSIGNOP <arithmeticExpression> TK_SEM	
+#pull up TK_ASSIGNOP; TK_ASSIGNOP---> <SingleOrRecId><arithmeticExpression>
+
+<singleOrRecId>===>TK_ID <singleOrRecIdprime>		
+#pull up TK_ID; TK_ID --->  <singleOrRecIdprime>
+
+<singleOrRecIdprime>===>  TK_DOT TK_FIELDID		
+#pull up TK_DOT; TK_DOT ---> TK_FIELDID	
+
+<singleOrRecIdprime>===> eps	
+#do nothing
+
+<funCallStmt>===><outputParameters> TK_CALL TK_FUNID TK_WITH TK_PARAMETERS <inputParameters> TK_SEM		
+#pull up TK_FUNID; TK_FUNID ---> <outputParameters> <inputParameters>
+
+<outputParameters> ==> TK_SQL <idList> TK_SQR TK_ASSIGNOP 	
+#pull up <idList>
+
+<outputParameters> ==> eps 					
+#do nothing
+
+<inputParameters>===> TK_SQL <idList> TK_SQR 			
+#pull up <idList>
+
+<iterativeStmt>===> TK_WHILE TK_OP <booleanExpression> TK_CL <stmt><otherStmts> TK_ENDWHILE 		
+#pull up TK_WHILE; TK_WHILE---> <booleanExpression><stmt><otherStmts>
+
+<conditionalStmt>===> TK_IF TK_OP <booleanExpression> TK_CL TK_THEN <stmt><otherStmts> <elsePart>		
+#pull up TK_IF; TK_IF---> <booleanExpression> TK_THEN <elsePart>; TK_THEN ---> <stmt><otherStmts> 
+
+<elsePart>===>TK_ELSE <stmt><otherStmts> TK_ENDIF 		
+#pull up TK_ELSE; TK_ELSE ---> <stmt><otherStmts>
+
+<elsePart>===>TK_ENDIF		
+#do nothing
+
+<ioStmt>===> TK_READ TK_OP <singleOrRecId> TK_CL TK_SEM 	
+#pull up TK_READ; TK_READ ---> <singleOrRecId>
+
+<ioStmt> ===> TK_WRITE TK_OP <allVar> TK_CL TK_SEM 		
+#pull up TK_WRITE; TK_WRITE---> <allVar>
+
+<allVar>===><var> 						
+#pull up <var>
+
+<allVar>===>TK_RECORDID TK_DOT TK_FIELDID TK_SEM																CHANGE
+#pull up TK_RECORD; TK_RECORDID ---> TK_DOT ---> TK_FIELDID 		
+
+<arithmeticExpression> ===> <term> <expPrime>
+#no change; retain
+
+<expPrime> ===> <lowPrecedenceOperators> <term> <expPrime> 
+#pull up <lowPrecedenceOperators>; <lowPrecedenceOperators> ---> <term> <expPrime>
+
+<expPrime> ===>eps
+#do nothing
+
+<term>===> <factor> <termPrime>
+#no change; retain
+
+<termPrime> ===> <highPrecedenceOperators><factor> <termPrime> 
+#pull up <highPrecedenceOperators><factor> <termPrime>
+
+<termPrime> ===>eps
+#do nothing
+
+<factor> ===> TK_OP <arithmeticExpression> TK_CL
+#pull up <arithmeticExpression> 
+
+<factor> ===><all>
+#pull up <all>
+
+<highPrecedenceOperator>===> TK_MUL 	
+#pull up TK_MUL
+
+<highPrecedenceOperator>===> TK_DIV  	
+#pull up TK_DIV
+
+<lowPrecedenceOperators> ===> TK_PLUS  	
+#pull up TK_PLUS
+
+<lowPrecedenceOperators> ===> TK_MINUS  
+#pull up TK_MINUS 
+
+<all>===> TK_ID 			
+#pull up TK_ID 
+
+<all>===> TK_NUM 			
+#pull up TK_NUM 	
+
+<all>===> TK_RNUM 			
+#pull up TK_RNUM 
+
+<all>===> TK_RECORDID <temp> 																CHANGE	
+#pull up TK_RECORDID;TK_RECORDID---><temp> 
+
+<temp>===> eps 				
+#do noting
+
+<temp>===>TK_DOT TK_FIELDID 		
+#pull up TK_DOT; TK_DOT ---> TK_FIELDID 
+
+<booleanExpression>===>TK_OP <booleanExpression> TK_CL <logicalOp> TK_OP <booleanExpression> TK_CL 		
+#pull up <logicalOp>; <logicalOp> ---> <booleanExpression> <booleanExpression>
+
+<booleanExpression>===> <var> <relationalOp> <var> 		
+#pull up <relationalOp>; <relationalOp> ---> <var><var> 
+
+<booleanExpression>===> TK_NOT <booleanExpression> 		
+#pull up TK_NOT; TK_NOT---><booleanExpression>
+
+<var>===> TK_ID 		
+#pull up TK_ID
+
+<var>===> TK_NUM 		
+#pull up TK_NUM
+
+<var>===> TK_RNUM 		
+#pull up TK_RNUM
+
+<logicalOp>===>TK_AND 		
+#pull up TK_AND 
+
+<logicalOp>===>TK_OR 		
+#pull up TK_OR
+
+<relationalOp>===> TK_LT 	
+#pull up TK_LT
+
+<relationalOp>===> TK_LE 	
+#pull up TK_LE
+
+<relationalOp>===> TK_EQ 	
+#pull up TK_EQ
+
+<relationalOp>===> TK_GT	
+#pull up TK_GT 
+
+<relationalOp>===> TK_GE 	
+#pull up TK_GE
+
+<relationalOp>===> TK_NE	
+#pull up TK_NE
+
+<returnStmt>===>TK_RETURN <optionalReturn> TK_SEM	
+#pull up <optionalReturn> 
+
+<optionalReturn>===>TK_SQL <idList> TK_SQR 		
+#pull up <idList>
+
+<optionalReturn>===>eps					
+#do nothing
+
+<idList>===> TK_ID <more_ids>				
+#pull up TK_ID; TK_ID ---> <more_ids>
+
+<more_ids>===> TK_COMMA <idList> 			
+#pull up <idList>
+
+<more_ids>===> eps					
+#do nothing
